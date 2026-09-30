@@ -1,0 +1,125 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ==========================================
+    // AUTHENTICATION & OWNERSHIP HELPER FUNCTIONS
+    // ==========================================
+
+    // Check if the user is authenticated with Firebase Auth
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    // Check if the authenticated user's UID matches the target userId
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    // ==========================================
+    // ITEM VALIDATION HELPER FUNCTIONS
+    // ==========================================
+
+    // Valid report types
+    function isValidItemType(type) {
+      return type in ['lost', 'found'];
+    }
+
+    // Valid item statuses
+    function isValidStatus(status) {
+      return status in ['active', 'resolved'];
+    }
+
+    // Validates that string fields meet non-empty, type, and length constraints (NO posterEmail)
+    function isValidItemPayload(data) {
+      return data.itemName is string && data.itemName.size() > 0 && data.itemName.size() <= 100 &&
+             data.category is string && data.category.size() > 0 &&
+             data.barangay is string && data.barangay.size() > 0 &&
+             data.location is string && data.location.size() > 0 && data.location.size() <= 200 &&
+             data.eventDate is string && data.eventDate.size() > 0 &&
+             data.description is string && data.description.size() > 0 && data.description.size() <= 1000 &&
+             data.contactInfo is string && data.contactInfo.size() <= 150 &&
+             data.posterName is string && data.posterName.size() > 0;
+    }
+
+    // Ensures only exact expected public schema keys exist on the item document (posterEmail completely excluded)
+    function hasExpectedItemKeys(data) {
+      return data.keys().hasOnly([
+        'userId',
+        'posterName',
+        'type',
+        'itemName',
+        'category',
+        'barangay',
+        'location',
+        'eventDate',
+        'description',
+        'contactInfo',
+        'status',
+        'createdAt',
+        'updatedAt'
+      ]);
+    }
+
+    // ==========================================
+    // USERS COLLECTION RULES
+    // ==========================================
+    match /users/{uid} {
+      // 1. GET: Only the account owner can read their profile
+      allow get: if isOwner(uid);
+
+      // 2. LIST: Denied - User enumeration is strictly prohibited
+      allow list: if false;
+
+      // 3. CREATE: Owner-only on registration, email matches Firebase Auth token, server timestamp enforced
+      allow create: if isOwner(uid) &&
+                       request.resource.data.uid == uid &&
+                       request.resource.data.email == request.auth.token.email &&
+                       request.resource.data.fullName is string &&
+                       request.resource.data.fullName.size() > 0 &&
+                       request.resource.data.createdAt == request.time &&
+                       request.resource.data.keys().hasOnly(['uid', 'fullName', 'email', 'createdAt']);
+
+      // 4. UPDATE: Denied for least privilege (profile editing not required at this stage)
+      allow update: if false;
+
+      // 5. DELETE: Denied
+      allow delete: if false;
+    }
+
+    // ==========================================
+    // ITEMS COLLECTION RULES (LOST & FOUND REPORTS)
+    // ==========================================
+    match /items/{itemId} {
+      // 1. PUBLIC READ: Anyone (including guests) can browse and inspect reports
+      allow read: if true;
+
+      // 2. CREATE: Authenticated owner, initial active status, server timestamps, strict keys (no posterEmail)
+      allow create: if isSignedIn() &&
+                       request.resource.data.userId == request.auth.uid &&
+                       request.resource.data.status == 'active' &&
+                       isValidItemType(request.resource.data.type) &&
+                       request.resource.data.createdAt == request.time &&
+                       request.resource.data.updatedAt == request.time &&
+                       hasExpectedItemKeys(request.resource.data) &&
+                       isValidItemPayload(request.resource.data);
+
+      // 3. UPDATE: Owner-only, immutable identity/classification/createdAt, valid status, server updatedAt
+      allow update: if isSignedIn() &&
+                       resource.data.userId == request.auth.uid &&
+                       request.resource.data.userId == resource.data.userId &&
+                       request.resource.data.type == resource.data.type &&
+                       request.resource.data.posterName == resource.data.posterName &&
+                       request.resource.data.createdAt == resource.data.createdAt &&
+                       request.resource.data.updatedAt == request.time &&
+                       isValidStatus(request.resource.data.status) &&
+                       hasExpectedItemKeys(request.resource.data) &&
+                       isValidItemPayload(request.resource.data);
+
+      // 4. DELETE: Only the report owner can permanently delete
+      allow delete: if isSignedIn() &&
+                       resource.data.userId == request.auth.uid;
+    }
+  }
+}

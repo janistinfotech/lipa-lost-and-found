@@ -1,0 +1,205 @@
+/* Edit Item Page Styles */
+.edit-item-page {
+  padding-top: 2.5rem;
+  padding-bottom: 5.5rem;
+  max-width: 920px;
+}
+
+.edit-topbar {
+  margin-bottom: 1.5rem;
+}
+
+.edit-header {
+  margin-bottom: 2rem;
+}
+
+.edit-badge-row {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.edit-title {
+  font-size: 2.25rem;
+  font-weight: 800;
+  color: var(--text-main);
+  letter-spacing: -0.025em;
+  margin-bottom: 0.35rem;
+}
+
+.edit-subtitle {
+  font-size: 1.05rem;
+  color: var(--text-secondary);
+}
+
+/* Success Banner */
+.edit-banner-success {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  padding: 1.25rem 1.5rem;
+  background-color: var(--color-found-bg);
+  border: 1.5px solid var(--color-found-border);
+  border-radius: var(--radius-lg);
+  margin-bottom: 2rem;
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+.banner-success-icon {
+  color: var(--color-found);
+  flex-shrink: 0;
+  margin-top: 0.15rem;
+}
+
+/* Error Banner */
+.edit-banner-error {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  padding: 1.25rem 1.5rem;
+  background-color: var(--color-lost-bg);
+  border: 1.5px solid var(--color-lost-border);
+  border-radius: var(--radius-lg);
+  margin-bottom: 2rem;
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+.banner-error-icon {
+  color: var(--color-lost);
+  flex-shrink: 0;
+  margin-top: 0.15rem;
+}
+
+/* Form Styles */
+.edit-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.75rem;
+}
+
+/* Fixed Type Banner */
+.fixed-type-banner {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  padding: 1rem 1.25rem;
+  background-color: var(--bg-main);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+}
+
+.fixed-type-icon {
+  width: 46px;
+  height: 46px;
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.fixed-type-icon.lost {
+  background-color: var(--color-lost-bg);
+  color: var(--color-lost);
+}
+
+.fixed-type-icon.found {
+  background-color: var(--color-found-bg);
+  color: var(--color-found);
+}
+
+.fixed-type-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.fixed-type-label {
+  font-size: 0.775rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.fixed-type-value {
+  font-family: var(--font-heading);
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: var(--text-main);
+}
+
+/* Form Actions */
+.edit-actions-bar {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  padding-top: 0.5rem;
+}
+
+.edit-save-btn {
+  min-width: 190px;
+}
+
+/* State Cards (Loading, Not Found, Denied) */
+.edit-state-card {
+  padding: 4.5rem 2rem;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  max-width: 600px;
+  margin: 2rem auto 0;
+  background-color: #FFFFFF;
+  border: 1.5px solid var(--border-color);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-sm);
+}
+
+.edit-state-title {
+  font-size: 1.85rem;
+  font-weight: 800;
+  color: var(--text-main);
+  margin-top: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.edit-state-desc {
+  font-size: 1rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin-bottom: 2rem;
+  max-width: 440px;
+}
+
+.edit-state-text {
+  margin-top: 1rem;
+  font-size: 0.95rem;
+  color: var(--text-secondary);
+  font-weight: 600;
+}
+
+.text-lost {
+  color: var(--color-lost);
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .edit-actions-bar {
+    flex-direction: column-reverse;
+  }
+
+  .edit-actions-bar .btn {
+    width: 100%;
+  }
+}
